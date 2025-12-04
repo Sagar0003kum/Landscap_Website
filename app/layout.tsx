@@ -1,11 +1,22 @@
+import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 
-export default function RootLayout({ children }) {
+export const metadata = {
+  title: "Landscape Website",
+  description: "Professional landscaping service website",
+};
+
+// 👇 ADD THIS TYPE
+type RootLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
         <AuthProvider>
-            {children}
+          {children}
         </AuthProvider>
       </body>
     </html>
