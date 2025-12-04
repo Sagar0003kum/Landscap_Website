@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { auth } from "../firebase/config";
+
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -9,6 +10,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 
+// MUI Components
 import {
   Dialog,
   DialogTitle,
@@ -16,17 +18,20 @@ import {
   TextField,
   Button,
   Typography,
+  Box,
   IconButton,
 } from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 
-type AuthModalProps = {
+export default function AuthModal({
+  show,
+  onClose,
+}: {
   show: boolean;
   onClose: () => void;
-};
-
-export default function AuthModal({ show, onClose }: AuthModalProps) {
-  const [mode, setMode] = useState("login");
+}) {
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,7 +59,8 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
 
       await sendEmailVerification(userCred.user);
 
-      alert("Verification email sent! Check your inbox.");
+      alert("Verification email sent! Please check your inbox.");
+
       onClose();
     } catch (err: any) {
       setError(err.message);
@@ -62,6 +68,8 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
   }
 
   async function handleLogin() {
+    setError("");
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       onClose();
@@ -72,10 +80,16 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={show} onClose={onClose} fullWidth maxWidth="xs">
+      {/* HEADER */}
       <DialogTitle
-        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        {/* FIXED: prevents <h6> inside <h2> error */}
+        <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
           {mode === "login" ? "Login" : "Create an Account"}
         </Typography>
 
@@ -84,7 +98,15 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {/* FORM CONTENT */}
+      <DialogContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          paddingBottom: 3,
+        }}
+      >
         {mode === "signup" && (
           <TextField
             label="Full Name"
@@ -95,16 +117,16 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
         )}
 
         <TextField
-          type="email"
           label="Email Address"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
         />
 
         <TextField
-          type="password"
           label="Password"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           fullWidth
@@ -112,8 +134,8 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
 
         {mode === "signup" && (
           <TextField
-            type="password"
             label="Confirm Password"
+            type="password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             fullWidth
@@ -121,35 +143,39 @@ export default function AuthModal({ show, onClose }: AuthModalProps) {
         )}
 
         {error && (
-          <Typography color="error" sx={{ fontSize: "0.9rem" }}>
+          <Typography color="error" sx={{ fontSize: "14px" }}>
             {error}
           </Typography>
         )}
 
         <Button
           variant="contained"
-          color="success"
+          fullWidth
+          sx={{ background: "#2e7d32", padding: "10px", mt: 1 }}
           onClick={mode === "login" ? handleLogin : handleSignup}
-          sx={{ mt: 1, py: 1.2 }}
         >
           {mode === "login" ? "Login" : "Sign Up"}
         </Button>
 
-        <Typography align="center" sx={{ mt: 1 }}>
-          {mode === "login"
-            ? "Don't have an account? "
-            : "Already have an account? "}
-          <span
-            style={{
-              color: "#2e7d32",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          >
-            {mode === "login" ? "Sign Up" : "Login"}
-          </span>
-        </Typography>
+        <Box textAlign="center" mt={1}>
+          <Typography variant="body2">
+            {mode === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+
+            <span
+              style={{
+                color: "#2e7d32",
+                marginLeft: "5px",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            >
+              {mode === "login" ? "Sign Up" : "Login"}
+            </span>
+          </Typography>
+        </Box>
       </DialogContent>
     </Dialog>
   );
