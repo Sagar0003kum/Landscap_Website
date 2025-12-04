@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { auth } from "../firebase/config";
-
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -14,17 +13,19 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   TextField,
   Button,
   Typography,
   IconButton,
-  Box,
 } from "@mui/material";
-
 import CloseIcon from "@mui/icons-material/Close";
 
-export default function AuthModal({ show, onClose }) {
+type AuthModalProps = {
+  show: boolean;
+  onClose: () => void;
+};
+
+export default function AuthModal({ show, onClose }: AuthModalProps) {
   const [mode, setMode] = useState("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -49,10 +50,8 @@ export default function AuthModal({ show, onClose }) {
         password
       );
 
-      // Set display name
       await updateProfile(userCred.user, { displayName: name });
 
-      // Send email verification
       await sendEmailVerification(userCred.user);
 
       alert("Verification email sent! Check your inbox.");
@@ -63,8 +62,6 @@ export default function AuthModal({ show, onClose }) {
   }
 
   async function handleLogin() {
-    setError("");
-
     try {
       await signInWithEmailAndPassword(auth, email, password);
       onClose();
@@ -75,19 +72,10 @@ export default function AuthModal({ show, onClose }) {
 
   return (
     <Dialog open={show} onClose={onClose} fullWidth maxWidth="xs">
-      {/* HEADER */}
       <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
+        sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
-        <Typography
-          component="span"
-          variant="h6"
-          sx={{ fontWeight: "bold" }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           {mode === "login" ? "Login" : "Create an Account"}
         </Typography>
 
@@ -96,79 +84,73 @@ export default function AuthModal({ show, onClose }) {
         </IconButton>
       </DialogTitle>
 
-      {/* FORM */}
-      <DialogContent>
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {mode === "signup" && (
           <TextField
             label="Full Name"
-            fullWidth
-            margin="dense"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            fullWidth
           />
         )}
 
         <TextField
+          type="email"
           label="Email Address"
-          fullWidth
-          margin="dense"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          fullWidth
         />
 
         <TextField
-          label="Password"
-          fullWidth
           type="password"
-          margin="dense"
+          label="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          fullWidth
         />
 
         {mode === "signup" && (
           <TextField
-            label="Confirm Password"
-            fullWidth
             type="password"
-            margin="dense"
+            label="Confirm Password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
+            fullWidth
           />
         )}
 
         {error && (
-          <Typography color="error" sx={{ mt: 1 }}>
+          <Typography color="error" sx={{ fontSize: "0.9rem" }}>
             {error}
           </Typography>
         )}
-      </DialogContent>
 
-      {/* ACTION BUTTONS */}
-      <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
           variant="contained"
-          fullWidth
-          sx={{ py: 1, borderRadius: "8px" }}
+          color="success"
           onClick={mode === "login" ? handleLogin : handleSignup}
+          sx={{ mt: 1, py: 1.2 }}
         >
           {mode === "login" ? "Login" : "Sign Up"}
         </Button>
-      </DialogActions>
 
-      {/* SWITCH MODE */}
-      <Box sx={{ textAlign: "center", mb: 2 }}>
-        <Typography>
+        <Typography align="center" sx={{ mt: 1 }}>
           {mode === "login"
-            ? "Don't have an account?"
-            : "Already have an account?"}{" "}
+            ? "Don't have an account? "
+            : "Already have an account? "}
           <span
-            style={{ color: "#1976d2", cursor: "pointer", fontWeight: "bold" }}
+            style={{
+              color: "#2e7d32",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
           >
             {mode === "login" ? "Sign Up" : "Login"}
           </span>
         </Typography>
-      </Box>
+      </DialogContent>
     </Dialog>
   );
 }
