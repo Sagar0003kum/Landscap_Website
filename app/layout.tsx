@@ -6,7 +6,7 @@ export const metadata = {
   description: "Professional landscaping service website",
 };
 
-// 👇 ADD THIS TYPE
+// Required type for Vercel build
 type RootLayoutProps = {
   children: React.ReactNode;
 };
@@ -14,10 +14,8 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+      <body suppressHydrationWarning={true}>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
