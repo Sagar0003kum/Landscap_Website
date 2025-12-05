@@ -5,6 +5,15 @@
   --foreground: #171717;
 }
 
+
+.primary-colour {
+  background-color: #477A40;
+}
+
+.secondary-colour {
+  background-color: #31270C;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
