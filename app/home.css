@@ -399,3 +399,10 @@
     align-items: flex-start;
   }
 }
+
+
+ .image-that-wont-position {
+        position: absolute;
+        top: 58px;
+        right: 144px;
+    }

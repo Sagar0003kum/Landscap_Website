@@ -32,11 +32,18 @@ export default function Page() {
   const [isFormValid, setIsFormValid] = useState(false);
 
 
-
   const [showAuth, setShowAuth] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
 
   const { user, logout } = useAuth();
+
+
+  /********** NOTE: USE THIS FOR AUTOMATIC LOGIN MODAL POP UP *******************/
+  // useEffect(() => {
+  // if (!user) {
+  //   setShowAuth(true);
+  // }
+  // } , [user]);
 
 
   useEffect(() => {
@@ -75,6 +82,25 @@ export default function Page() {
 
 
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      setShowAuth(true); // Show login modal
+      return;
+    }
+
+    console.log('Form submitted:', {
+    projectType: selectedProjectType,
+    material: selectedMaterial,
+    fenceType: selectedFenceType,
+    dimensions
+    });
+
+    alert('Quote request sent to your email!');
+
+  }
+
   const handleMenuOpen = (event) => {
     setMenuAnchor(event.currentTarget);
   };
@@ -96,6 +122,7 @@ export default function Page() {
 
   return (
     <>
+      {/* Had ts commeneted out tryna figure out why the code wasnt working */}
       <AuthModal show={showAuth} onClose={() => setShowAuth(false)} />
 
 
@@ -158,7 +185,7 @@ export default function Page() {
           )}
         </Toolbar>
       </AppBar>    
-    <main className='home-wrapper'>
+    <main className='home-wrapper flex'>
       <div className='w-185'>
         <div className='text-left py-8 pl-5 primary-colour w-185 text-white font-bold text-4xl rounded-r-4xl'>
           <p>
@@ -173,7 +200,7 @@ export default function Page() {
 
 
         {/* STYLE THESE COMPONENTS */}
-        <form className='mt-10 p-5 pr-0 border-green-900 border-4 text-xl w-185'>
+        <form className='mt-10 p-5 pr-0 border-green-900 border-4 text-xl w-185' onSubmit={handleFormSubmit}>
           {/* Project Type */}
           <p className='font-semibold'>Project Type:</p>
           <input 
@@ -382,9 +409,12 @@ export default function Page() {
           */}
           <div className='flex justify-end'>
 
-            <input type="submit" value="Get Quote" 
+            <input 
+              type="submit" 
+              value="Get Quote" 
               disabled={!isFormValid}
-              className='border rounded-4xl border-green-800 p-4 hover:bg-green-800 hover:text-white hover:scale-95 active:scale-100 mt-20 mb-5 mr-10 disabled:opacity-50 disabled:cursor-not-allowed' />
+              className='border rounded-4xl border-green-800 p-4 hover:bg-green-800 hover:text-white hover:scale-95 active:scale-100 mt-20 mb-5 mr-10 disabled:opacity-50 disabled:cursor-not-allowed' 
+            />
 
 
 
@@ -394,12 +424,23 @@ export default function Page() {
 
         </form>
 
-
-
-    
       </div>
 
+
+      <div className='relative image-that-wont-position w-[450px] h-[727px] rounded-xl overflow-hidden scale-80'>
+        <Image
+          src="/projects/project-7.jpg"
+          alt="Finished deck with seating"
+          fill
+          className="object-cover"
+          />
+      </div>
+
+
+
+
     </main>
+
 
     </>
 
@@ -412,8 +453,6 @@ export default function Page() {
 
 
 /**
- * On Form Submit shows modal to sign in otherwise if user already has signed in shows modal "Successfully sent to {user's email}"
- * 
  * To keep it secure it only sends the calculated estimate on the email not on the screen
  * 
  * 
