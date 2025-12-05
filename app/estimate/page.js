@@ -6,6 +6,11 @@ import Image from 'next/image';
 import AuthModal from "../components/AuthModal";
 import { useAuth } from "../context/AuthContext";
 
+import QuoteSuccessModal from "../components/QuoteSuccessModal";
+
+import emailjs from '@emailjs/browser';
+
+
 import "../home.css";
 
 // MUI imports
@@ -22,9 +27,12 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 
 export default function Page() {
 
+  emailjs.init('VYdNBLKU2JIYKKcva');
+  
   const [selectedProjectType, setSelectedProjectType] = useState('');
 
   const [calculatedPrice, setCalculatedPrice] = useState(0);
+
 
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [selectedFenceType, setSelectedFenceType] = useState('');
@@ -36,6 +44,10 @@ export default function Page() {
   const [menuAnchor, setMenuAnchor] = useState(null);
 
   const { user, logout } = useAuth();
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  
 
 
   /********** NOTE: USE THIS FOR AUTOMATIC LOGIN MODAL POP UP *******************/
@@ -82,7 +94,7 @@ export default function Page() {
 
 
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (!user) {
@@ -97,7 +109,35 @@ export default function Page() {
     dimensions
     });
 
-    alert('Quote request sent to your email!');
+    // Decided to use custom modal instead of alert pop up
+    // alert('Quote request sent to your email!');
+
+    console.log('Sending to:', user.email);
+
+
+
+      try {
+        await emailjs.send('service_my1ew5p', 'template_ygvpo45', {
+          from_name: (user.displayName || user.email.split('@')[0] || 'Customer').trim(),
+          user_email: user.email?.trim() || '',
+          project_type: selectedProjectType?.trim(),
+          material: selectedMaterial?.trim(),
+          fence_type: selectedFenceType ? selectedFenceType.trim() : '',
+          dimensions: formatDimensions()?.trim(),
+          to_email: user.email?.trim() || '',
+          email: user.email?.trim() || '',
+
+          fence_section: selectedFenceType ? `Fence Type: ${selectedFenceType}` : '',
+          unit_price: selectedFenceType ? '$22/lnft' : '$15/sqft',
+          project_total: selectedFenceType ? '$8,645' : '$8,300',
+          fence_price: selectedFenceType ? '$145' : '',
+        });
+        
+        setShowSuccessModal(true);
+
+      } catch (error) {
+        console.error('Email error:', error);
+      }
 
   }
 
@@ -116,6 +156,19 @@ export default function Page() {
       console.error("Logout error:", err);
     } finally {
       handleMenuClose();
+    }
+  };
+
+  const formatDimensions = () => {
+    switch (selectedProjectType) {
+      case 'Deck':
+      case 'Pergola':
+      case 'Pavilion':
+        return `${dimensions.height || 0}'H x ${dimensions.width || 0}'W x ${dimensions.depth || dimensions.length || 0}'D (sq/ft)`;
+      case 'Fence':
+        return `${dimensions.height || 0}'H x ${dimensions.perimeter || 0}' perimeter (ln/ft)`;
+      default:
+        return JSON.stringify(dimensions);
     }
   };
 
@@ -200,7 +253,7 @@ export default function Page() {
 
 
         {/* STYLE THESE COMPONENTS */}
-        <form className='mt-10 p-5 pr-0 border-green-900 border-4 text-xl w-185' onSubmit={handleFormSubmit}>
+        <form className='mt-10 p-5 pr-0 border-green-800 border-4 text-xl w-185' onSubmit={handleFormSubmit}>
           {/* Project Type */}
           <p className='font-semibold'>Project Type:</p>
           <input 
@@ -427,7 +480,7 @@ export default function Page() {
       </div>
 
 
-      <div className='relative image-that-wont-position w-[450px] h-[727px] rounded-xl overflow-hidden scale-80'>
+      <div className='relative image-that-wont-position w-[450px] h-[727px] rounded-xl overflow-hidden scale-80 dumnbass-image-shadow'>
         <Image
           src="/projects/project-7.jpg"
           alt="Finished deck with seating"
@@ -435,6 +488,12 @@ export default function Page() {
           className="object-cover"
           />
       </div>
+
+
+      <QuoteSuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+      />      
 
 
 
@@ -448,7 +507,33 @@ export default function Page() {
 
 }
 
-// Show wood construction image on the right
+
+/**********  Code for when Sagar adds the firestore collection  **************/
+// const handleFormSubmit = async (e) => {
+//   e.preventDefault();
+//   if (!user) { setShowAuth(true); return; }
+
+//   const formData = {
+//     userId: user.uid,
+//     userEmail: user.email,
+//     projectType: selectedProjectType,
+//     material: selectedMaterial,
+//     fenceType: selectedFenceType,
+//     dimensions,
+//     timestamp: new Date()
+//   };
+
+//   try {
+//     // Save to Firestore collection that triggers email
+//     await addDoc(collection(db, 'quoteRequests'), formData);
+//     setShowSuccessModal(true);
+//   } catch (error) {
+//     console.error('Error saving quote:', error);
+//   }
+// };
+
+
+
 
 
 

@@ -406,3 +406,14 @@
         top: 58px;
         right: 144px;
     }
+
+
+.dumnbass-image-shadow {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+}
+
+.primary-color-border {
+  border-color: #477A40,
+}
+
+
