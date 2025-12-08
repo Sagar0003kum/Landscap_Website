@@ -694,7 +694,7 @@ export default function Page() {
 
         <div className="relative image-that-wont-position w-[450px] h-[727px] rounded-xl overflow-hidden scale-80 dumnbass-image-shadow">
           <Image
-            src="/projects/project-7.jpg"
+            src="/projects/project-7.JPG"
             alt="Finished deck with seating"
             fill
             className="object-cover"
