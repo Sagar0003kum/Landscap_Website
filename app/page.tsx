@@ -9,7 +9,6 @@ import { useAuth } from "./context/AuthContext";
 
 import "./home.css";
 
-// MUI imports
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
@@ -26,7 +25,6 @@ export default function HomePage() {
 
   const { user, logout } = useAuth();
 
-  // Optional: show popup shortly after page load ONLY if not logged in
   useEffect(() => {
     if (!user) {
       const alreadySeen = localStorage.getItem("hasSeenAuth");
@@ -39,7 +37,6 @@ export default function HomePage() {
     }
   }, [user]);
 
-  // Menu handlers for profile dropdown
   const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setMenuAnchor(event.currentTarget);
   };
@@ -60,10 +57,8 @@ export default function HomePage() {
 
   return (
     <>
-      {/* 🔐 Auth Modal */}
       <AuthModal show={showAuth} onClose={() => setShowAuth(false)} />
 
-      {/* 🌿 Top Bar with Material UI */}
       <AppBar
         position="static"
         color="transparent"
@@ -71,12 +66,10 @@ export default function HomePage() {
         sx={{ px: 4, pt: 1 }}
       >
         <Toolbar disableGutters sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Brand / Logo */}
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2f5b2f" }}>
             Landscape Craftsmen · Calgary, AB
           </Typography>
 
-          {/* Right side: Login OR Profile */}
           {!user ? (
             <Button
               variant="outlined"
@@ -123,9 +116,7 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* 🌿 Existing page content */}
       <main className="home-wrapper">
-        {/* HERO SECTION */}
         <section className="hero-section">
           <div className="hero-content">
             <p className="hero-kicker">LANDSCAPE CRAFTSMEN · CALGARY, AB</p>
@@ -147,7 +138,7 @@ export default function HomePage() {
             </div>
 
             <div className="hero-tags">
-              <span>Licensed &amp; Insured</span>
+              <span>Licensed & Insured</span>
               <span>Decks · Fences · Pergolas · Sod</span>
             </div>
           </div>
@@ -155,7 +146,7 @@ export default function HomePage() {
           <div className="hero-image">
             <div className="hero-image-card">
               <Image
-                src="/projects/project-10.jpg"
+                src="/projects/project-1.JPG"
                 alt="Freshly built cedar deck"
                 fill
                 className="hero-image-photo"
@@ -164,7 +155,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* PROJECT PREVIEW */}
         <section className="projects-preview">
           <div className="section-header">
             <h2>Our Recent Projects</h2>
@@ -177,7 +167,7 @@ export default function HomePage() {
           <div className="project-grid">
             <div className="project-card">
               <Image
-                src="/projects/project-2.jpg"
+                src="/projects/project-2.JPG"
                 alt="Row of new decks"
                 fill
                 className="project-photo"
@@ -186,7 +176,7 @@ export default function HomePage() {
 
             <div className="project-card">
               <Image
-                src="/projects/project-3.jpg"
+                src="/projects/project-3.JPG"
                 alt="Covered deck with railing"
                 fill
                 className="project-photo"
@@ -195,7 +185,7 @@ export default function HomePage() {
 
             <div className="project-card">
               <Image
-                src="/projects/project-4.jpg"
+                src="/projects/project-4.JPG"
                 alt="Backyard patio and pergola"
                 fill
                 className="project-photo"
@@ -208,7 +198,6 @@ export default function HomePage() {
           </Link>
         </section>
 
-        {/* SERVICES */}
         <section className="services-preview">
           <div className="section-header">
             <h2>What We Offer</h2>
@@ -220,7 +209,7 @@ export default function HomePage() {
 
           <div className="services-grid">
             <article className="service-card">
-              <h3>Custom Decks &amp; Railings</h3>
+              <h3>Custom Decks & Railings</h3>
               <p>
                 Pressure treated, cedar or composite decks built to code with
                 clean finishes and long-lasting protection.
@@ -228,15 +217,15 @@ export default function HomePage() {
             </article>
 
             <article className="service-card">
-              <h3>Fences &amp; Privacy Solutions</h3>
+              <h3>Fences & Privacy Solutions</h3>
               <p>
-                Solid wood fences, screens and gates that add privacy, security
-                and a polished look to your yard.
+                Solid wood fences, screens and gates that add privacy,
+                security and a polished look to your yard.
               </p>
             </article>
 
             <article className="service-card">
-              <h3>Pergolas &amp; Outdoor Structures</h3>
+              <h3>Pergolas & Outdoor Structures</h3>
               <p>
                 Shade structures, covered decks and pergolas tailored to your
                 home and how you actually use the space.
@@ -244,7 +233,7 @@ export default function HomePage() {
             </article>
 
             <article className="service-card">
-              <h3>Sod &amp; Yard Refresh</h3>
+              <h3>Sod & Yard Refresh</h3>
               <p>
                 Final grading, new sod and tidy details so your new build or
                 renovation is ready to enjoy right away.
@@ -253,7 +242,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ABOUT */}
         <section className="about-preview">
           <div className="about-text">
             <h2>Why Homeowners Choose Landscape Craftsmen</h2>
@@ -272,7 +260,7 @@ export default function HomePage() {
           <div className="about-photo-wrap">
             <div className="about-photo-card">
               <Image
-                src="/projects/project-5.jpg"
+                src="/projects/project-1.JPG"
                 alt="Finished deck with seating"
                 fill
                 className="about-photo"
@@ -281,7 +269,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* TESTIMONIALS */}
         <section className="testimonials-section">
           <h2>What Our Clients Say</h2>
 
@@ -311,7 +298,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CALL TO ACTION */}
         <section className="cta-banner">
           <div className="cta-content">
             <h2>Ready to Start Your Next Project?</h2>
