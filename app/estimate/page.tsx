@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, MouseEvent } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import AuthModal from "../components/AuthModal";
-import { useAuth } from "../context/AuthContext";
 import QuoteSuccessModal from "../components/QuoteSuccessModal";
+import { useAuth } from "../context/AuthContext";
 
 import emailjs from "@emailjs/browser";
 
@@ -22,9 +22,9 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
-export default function EstimatePage() {
-  emailjs.init("VYdNBLKU2JIYKKcva");
+emailjs.init("VYdNBLKU2JIYKKcva");
 
+export default function Page() {
   const [selectedProjectType, setSelectedProjectType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedFenceType, setSelectedFenceType] = useState("");
@@ -68,8 +68,15 @@ export default function EstimatePage() {
         hasDimensions = false;
     }
 
-    setIsFormValid(hasProjectType && hasMaterial && hasDimensions && hasFenceType);
-  }, [selectedProjectType, selectedMaterial, selectedFenceType, dimensions]);
+    setIsFormValid(
+      hasProjectType && hasMaterial && hasDimensions && hasFenceType
+    );
+  }, [
+    selectedProjectType,
+    selectedMaterial,
+    dimensions,
+    selectedFenceType,
+  ]);
 
   useEffect(() => {
     setDimensions({});
@@ -89,23 +96,30 @@ export default function EstimatePage() {
       await emailjs.send("service_my1ew5p", "template_ygvpo45", {
         from_name:
           (user.displayName ||
-            user.email.split("@")[0] ||
+            user.email?.split("@")[0] ||
             "Customer") + "",
-        user_email: user.email + "",
+        user_email: user.email || "",
         project_type: selectedProjectType + "",
         material: selectedMaterial + "",
         fence_type: selectedFenceType + "",
         dimensions: formatDimensions() + "",
-        to_email: user.email + ""
+        to_email: user.email || "",
+        email: user.email || "",
+        fence_section: selectedFenceType
+          ? `Fence Type: ${selectedFenceType}`
+          : "",
+        unit_price: selectedFenceType ? "$22/lnft" : "$15/sqft",
+        project_total: selectedFenceType ? "$8,645" : "$8,300",
+        fence_price: selectedFenceType ? "$145" : "",
       });
 
       setShowSuccessModal(true);
     } catch (error) {
-      console.error(error);
+      console.error("Email error:", error);
     }
   };
 
-  const handleMenuOpen = (event: MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: any) => {
     setMenuAnchor(event.currentTarget);
   };
 
@@ -116,7 +130,7 @@ export default function EstimatePage() {
   const handleLogoutClick = async () => {
     try {
       await logout();
-    } catch (e) {}
+    } catch {}
     handleMenuClose();
   };
 
@@ -125,13 +139,15 @@ export default function EstimatePage() {
       case "Deck":
       case "Pergola":
       case "Pavilion":
-        return `${dimensions.height || 0}'H × ${dimensions.width || 0}'W × ${
-          dimensions.depth || dimensions.length || 0
-        }'D`;
+        return `${dimensions.height || 0}'H x ${
+          dimensions.width || 0
+        }'W x ${dimensions.depth || dimensions.length || 0}'D (sq/ft)`;
       case "Fence":
-        return `${dimensions.height || 0}'H × ${dimensions.perimeter || 0}' perimeter`;
+        return `${dimensions.height || 0}'H x ${
+          dimensions.perimeter || 0
+        }' perimeter (ln/ft)`;
       default:
-        return "";
+        return JSON.stringify(dimensions);
     }
   };
 
@@ -168,8 +184,8 @@ export default function EstimatePage() {
                 color: "#2f5b2f",
                 "&:hover": {
                   borderColor: "#204020",
-                  backgroundColor: "#f1f7f1"
-                }
+                  backgroundColor: "#f1f7f1",
+                },
               }}
             >
               Login / Sign Up
@@ -183,10 +199,13 @@ export default function EstimatePage() {
               >
                 <AccountCircle />
               </IconButton>
-
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 500, color: "#2f5b2f", cursor: "pointer" }}
+                sx={{
+                  fontWeight: 500,
+                  color: "#2f5b2f",
+                  cursor: "pointer",
+                }}
                 onClick={handleMenuOpen}
               >
                 {user.displayName || user.email}
@@ -196,6 +215,14 @@ export default function EstimatePage() {
                 anchorEl={menuAnchor}
                 open={Boolean(menuAnchor)}
                 onClose={handleMenuClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
               >
                 <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
               </Menu>
@@ -210,6 +237,11 @@ export default function EstimatePage() {
             <p>Get a Free Estimate On Your Next Project</p>
           </div>
 
+          <p className="mt-5 ml-5 text-2xl w-180 font-light">
+            All that we require are your ideas to visualize the project
+            you want.
+          </p>
+
           <form
             className="mt-10 p-5 pr-0 border-green-800 border-4 text-xl w-185"
             onSubmit={handleFormSubmit}
@@ -218,55 +250,64 @@ export default function EstimatePage() {
 
             <input
               type="radio"
+              id="deck"
               name="proj_type"
               value="Deck"
+              className="mt-4"
               checked={selectedProjectType === "Deck"}
               onChange={(e) => setSelectedProjectType(e.target.value)}
             />
-            <label> Deck</label>
+            <label htmlFor="deck"> Deck</label>
             <br />
 
             <input
               type="radio"
+              id="fence"
               name="proj_type"
               value="Fence"
               checked={selectedProjectType === "Fence"}
               onChange={(e) => setSelectedProjectType(e.target.value)}
             />
-            <label> Fence</label>
+            <label htmlFor="fence"> Fence</label>
             <br />
 
             <input
               type="radio"
+              id="pergola"
               name="proj_type"
               value="Pergola"
               checked={selectedProjectType === "Pergola"}
               onChange={(e) => setSelectedProjectType(e.target.value)}
             />
-            <label> Pergola</label>
+            <label htmlFor="pergola"> Pergola</label>
             <br />
 
             <input
               type="radio"
+              id="pavilion"
               name="proj_type"
               value="Pavilion"
               checked={selectedProjectType === "Pavilion"}
               onChange={(e) => setSelectedProjectType(e.target.value)}
             />
-            <label> Pavilion</label>
+            <label htmlFor="pavilion"> Pavilion</label>
             <br />
             <br />
 
             {selectedProjectType === "Deck" && (
-              <>
+              <div>
                 <p className="font-semibold">Material:</p>
+
                 <label>
                   <input
                     type="radio"
                     name="material"
                     value="PVC"
+                    className="mt-4"
                     checked={selectedMaterial === "PVC"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   PVC
                 </label>
@@ -278,7 +319,9 @@ export default function EstimatePage() {
                     name="material"
                     value="Wood"
                     checked={selectedMaterial === "Wood"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Wood
                 </label>
@@ -290,17 +333,19 @@ export default function EstimatePage() {
                     name="material"
                     value="Composite"
                     checked={selectedMaterial === "Composite"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Composite
                 </label>
                 <br />
                 <br />
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Fence" && (
-              <>
+              <div>
                 <p className="font-semibold">Material:</p>
 
                 <label>
@@ -308,8 +353,11 @@ export default function EstimatePage() {
                     type="radio"
                     name="material"
                     value="Aluminum"
+                    className="mt-4"
                     checked={selectedMaterial === "Aluminum"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Aluminum
                 </label>
@@ -321,7 +369,9 @@ export default function EstimatePage() {
                     name="material"
                     value="Vinyl"
                     checked={selectedMaterial === "Vinyl"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Vinyl
                 </label>
@@ -333,7 +383,9 @@ export default function EstimatePage() {
                     name="material"
                     value="Metal"
                     checked={selectedMaterial === "Metal"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Metal
                 </label>
@@ -345,7 +397,9 @@ export default function EstimatePage() {
                     name="material"
                     value="Wood"
                     checked={selectedMaterial === "Wood"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Wood
                 </label>
@@ -357,17 +411,19 @@ export default function EstimatePage() {
                     name="material"
                     value="Composite"
                     checked={selectedMaterial === "Composite"}
-                    onChange={(e) => setSelectedMaterial(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedMaterial(e.target.value)
+                    }
                   />{" "}
                   Composite
                 </label>
                 <br />
                 <br />
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Fence" && (
-              <>
+              <div>
                 <p className="font-semibold">Type:</p>
 
                 <label>
@@ -375,8 +431,11 @@ export default function EstimatePage() {
                     type="radio"
                     name="fence_type"
                     value="Lattice"
+                    className="mt-4"
                     checked={selectedFenceType === "Lattice"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Lattice
                 </label>
@@ -388,7 +447,9 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Board on Board"
                     checked={selectedFenceType === "Board on Board"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Board on Board
                 </label>
@@ -400,7 +461,9 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Split Rail"
                     checked={selectedFenceType === "Split Rail"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Split Rail
                 </label>
@@ -412,7 +475,9 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Tongue and Groove"
                     checked={selectedFenceType === "Tongue and Groove"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Tongue and Groove
                 </label>
@@ -424,7 +489,9 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Picket"
                     checked={selectedFenceType === "Picket"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Picket
                 </label>
@@ -436,7 +503,9 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Chain Link"
                     checked={selectedFenceType === "Chain Link"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Chain Link
                 </label>
@@ -448,17 +517,19 @@ export default function EstimatePage() {
                     name="fence_type"
                     value="Masonry"
                     checked={selectedFenceType === "Masonry"}
-                    onChange={(e) => setSelectedFenceType(e.target.value)}
+                    onChange={(e) =>
+                      setSelectedFenceType(e.target.value)
+                    }
                   />{" "}
                   Masonry
                 </label>
                 <br />
                 <br />
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Deck" && (
-              <>
+              <div>
                 <p className="font-semibold">Dimensions (sq/ft):</p>
                 <div className="flex gap-3 mt-2">
                   <input
@@ -468,7 +539,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        height: parseFloat(e.target.value) || 0
+                        height: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -479,7 +550,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        width: parseFloat(e.target.value) || 0
+                        width: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -490,16 +561,16 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        depth: parseFloat(e.target.value) || 0
+                        depth: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Fence" && (
-              <>
+              <div>
                 <p className="font-semibold">Dimensions (ln/ft):</p>
                 <div className="flex gap-3 mt-2">
                   <input
@@ -509,11 +580,10 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        height: parseFloat(e.target.value) || 0
+                        height: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
-
                   <input
                     type="number"
                     placeholder="Perimeter"
@@ -521,16 +591,16 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        perimeter: parseFloat(e.target.value) || 0
+                        perimeter: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Pergola" && (
-              <>
+              <div>
                 <p className="font-semibold">Dimensions (sq/ft):</p>
                 <div className="flex gap-3 mt-2">
                   <input
@@ -540,7 +610,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        height: parseFloat(e.target.value) || 0
+                        height: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -551,7 +621,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        width: parseFloat(e.target.value) || 0
+                        width: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -562,16 +632,16 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        length: parseFloat(e.target.value) || 0
+                        length: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {selectedProjectType === "Pavilion" && (
-              <>
+              <div>
                 <p className="font-semibold">Dimensions (sq/ft):</p>
                 <div className="flex gap-3 mt-2">
                   <input
@@ -581,7 +651,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        height: parseFloat(e.target.value) || 0
+                        height: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -592,7 +662,7 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        width: parseFloat(e.target.value) || 0
+                        width: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
@@ -603,12 +673,12 @@ export default function EstimatePage() {
                     onChange={(e) =>
                       setDimensions({
                         ...dimensions,
-                        length: parseFloat(e.target.value) || 0
+                        length: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
                 </div>
-              </>
+              </div>
             )}
 
             <div className="flex justify-end">
@@ -624,8 +694,8 @@ export default function EstimatePage() {
 
         <div className="relative image-that-wont-position w-[450px] h-[727px] rounded-xl overflow-hidden scale-80 dumnbass-image-shadow">
           <Image
-            src="/projects/project-7.JPG"
-            alt="Project sample"
+            src="/projects/project-7.jpg"
+            alt="Finished deck with seating"
             fill
             className="object-cover"
           />
