@@ -1,14 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase/config";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
-const AuthContext = createContext<unknown>(null);
+type AuthContextType = {
+  user: User | null;
+  logout: () => Promise<void>;
+};
 
-export function AuthProvider({ children }: any) {
-  const [user, setUser] = useState<unknown>(null);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  logout: async () => {},
+});
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,13 +23,11 @@ export function AuthProvider({ children }: any) {
       setUser(firebaseUser);
       setLoading(false);
     });
-
     return unsub;
   }, []);
 
-  // ✅ REAL LOGOUT FUNCTION
   async function logout() {
-    return signOut(auth);
+    await signOut(auth);
   }
 
   return (
