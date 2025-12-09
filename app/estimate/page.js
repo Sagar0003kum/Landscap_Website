@@ -130,6 +130,7 @@ export default function Page() {
           fence_section: selectedFenceType ? `Fence Type: ${selectedFenceType}` : '',
           unit_price: selectedFenceType ? '$22/lnft' : '$15/sqft',
           project_total: selectedFenceType ? '$8,645' : '$8,300',
+          project_final: selectedFenceType ? '$8,945' : '$8,600',
           fence_price: selectedFenceType ? '$145' : '',
         });
         
